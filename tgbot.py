@@ -3,16 +3,13 @@ import os
 
 from detect_intents import detect_intent_texts
 from dotenv import load_dotenv
+from handler import TelegramBotHandler
+from telegram.error import NetworkError
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, CallbackContext)
 
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-logger = logging.getLogger(__name__)
-load_dotenv()
+logger = logging.getLogger('intents')
 
 
 def start(update, context):
@@ -20,20 +17,31 @@ def start(update, context):
 
 
 def greet(update, context):
-    user_text = update.message.text
-    answer, is_fallback = detect_intent_texts(
-        context.bot_data['project_id'],
-        context.bot_data['token'], user_text, 'ru')
-    update.message.reply_text(answer)
+    try:
+        user_text = update.message.text
+        answer, is_fallback = detect_intent_texts(
+            context.bot_data['project_id'],
+            context.bot_data['token'], user_text, 'ru')
+        update.message.reply_text(answer)
+    except NetworkError:
+        logger.error('Network Error occured')
 
 
 def main():
-    token = os.getenv('TG_BOT_TOKEN')
-    updater = Updater(token)
+    load_dotenv()
 
+    tg_token = os.getenv('TG_BOT_TOKEN')
+    logbot_token = os.getenv('TG_LOG_BOT_TOKEN')
+    chat_id = os.getenv('TG_CHAT_ID')
+
+    logger.setLevel(logging.WARNING)
+    logger.addHandler(TelegramBotHandler(logbot_token, chat_id))
+
+    updater = Updater(tg_token)
     dispatcher = updater.dispatcher
     context = CallbackContext(dispatcher)
-    context.bot_data['project_id'] = os.getenv('PROJECT_ID')
+
+    context.bot_data['project_id'] = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     context.bot_data['token'] = os.getenv('TG_BOT_TOKEN')
 
     dispatcher.add_handler(CommandHandler('start', start))
