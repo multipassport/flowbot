@@ -24,8 +24,9 @@ def start(update, context):
 
 def greet(update, context):
     user_text = update.message.text
-    if answer := detect_intent_texts(context.bot_data['project_id'], token, user_text, 'ru'):
-        update.message.reply_text(answer)
+    answer, is_fallback = detect_intent_texts(
+        context.bot_data['project_id'], token, user_text, 'ru')
+    update.message.reply_text(answer)
 
 
 def main():

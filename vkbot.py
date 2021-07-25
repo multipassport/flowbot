@@ -16,7 +16,9 @@ def echo(event, vk_api):
 
 
 def answer(event, vk_api):
-    if message := detect_intent_texts('game-of-verbs-316712', event.user_id, event.text, 'ru'):
+    message, is_fallback = detect_intent_texts(
+        'game-of-verbs-316712', event.user_id, event.text, 'ru')
+    if not is_fallback:
         vk_api.messages.send(
             user_id=event.user_id,
             message=message,
