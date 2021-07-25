@@ -14,9 +14,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 load_dotenv()
 
-token = os.getenv('TG_BOT_TOKEN')
-project_id = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-
 
 def start(update, context):
     update.message.reply_text('Здравствуйте')
@@ -25,16 +22,19 @@ def start(update, context):
 def greet(update, context):
     user_text = update.message.text
     answer, is_fallback = detect_intent_texts(
-        context.bot_data['project_id'], token, user_text, 'ru')
+        context.bot_data['project_id'],
+        context.bot_data['token'], user_text, 'ru')
     update.message.reply_text(answer)
 
 
 def main():
+    token = os.getenv('TG_BOT_TOKEN')
     updater = Updater(token)
 
     dispatcher = updater.dispatcher
     context = CallbackContext(dispatcher)
-    context.bot_data['project_id'] = 'game-of-verbs-316712'
+    context.bot_data['project_id'] = os.getenv('PROJECT_ID')
+    context.bot_data['token'] = os.getenv('TG_BOT_TOKEN')
 
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(MessageHandler(Filters.text, greet))

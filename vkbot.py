@@ -15,9 +15,9 @@ def echo(event, vk_api):
     )
 
 
-def answer(event, vk_api):
+def answer(event, vk_api, project_id):
     message, is_fallback = detect_intent_texts(
-        'game-of-verbs-316712', event.user_id, event.text, 'ru')
+        project_id, event.user_id, event.text, 'ru')
     if not is_fallback:
         vk_api.messages.send(
             user_id=event.user_id,
@@ -30,6 +30,8 @@ def main():
     load_dotenv()
 
     vk_token = os.getenv('VK_API_TOKEN')
+    project_id = os.getenv('PROJECT_ID')
+
     vk_session = vk.VkApi(token=vk_token)
     vk_api = vk_session.get_api()
 
@@ -37,7 +39,7 @@ def main():
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            answer(event, vk_api)
+            answer(event, vk_api, project_id)
 
 
 if __name__ == '__main__':
