@@ -32,7 +32,7 @@ def answer(event, vk_api, project_id):
                 random_id=random.randint(1, 1000)
             )
         except ApiError as error:
-            logger.error(f'Error {error.code} occured')
+            logger.exception(f'Error {error.code} occured')
 
 
 def main():

@@ -24,7 +24,7 @@ def greet(update, context):
             context.bot_data['token'], user_text, 'ru')
         update.message.reply_text(answer)
     except NetworkError:
-        logger.error('Network Error occured')
+        logger.exception('Network Error occured')
 
 
 def main():

@@ -3,7 +3,7 @@ import logging
 from google.cloud import dialogflow
 
 
-logger = logging.getLogger('intents')
+logger = logging.getLogghttps://github.com/multipassport/flowboter('intents')
 
 
 def detect_intent_texts(project_id, session_id, text, language_code):
@@ -19,5 +19,5 @@ def detect_intent_texts(project_id, session_id, text, language_code):
         )
         query_result = response.query_result
     except ConnectionError:
-        logger.error('Lost connection to Google Cloud')
+        logger.exception('Lost connection to Google Cloud')
     return query_result.fulfillment_text, query_result.intent.is_fallback
