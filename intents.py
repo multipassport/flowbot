@@ -42,8 +42,11 @@ def create_intent(project_id, display_name,
 
 
 def get_training_phrases(filepath):
-    with open(filepath, 'r', encoding='utf-8') as file:
-        return json.load(file)
+    try:
+        with open(filepath, 'r', encoding='utf-8') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        logger.exception('Wrong filepath')
 
 
 def create_parser():
