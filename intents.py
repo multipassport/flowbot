@@ -1,8 +1,13 @@
 import json
+import logging
 import os
 
 from dotenv import load_dotenv
 from google.cloud import dialogflow
+
+
+logger = logging.getLogger('intents')
+logging.basicConfig(filename='intents.log', level=logging.INFO)
 
 
 def create_intent(project_id, display_name, training_phrases_parts, message_texts):
@@ -12,7 +17,6 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
     training_phrases = []
     for training_phrases_part in training_phrases_parts:
         part = dialogflow.Intent.TrainingPhrase.Part(text=training_phrases_part)
-        # Here we create a new training phrase for each provided part.
         training_phrase = dialogflow.Intent.TrainingPhrase(parts=[part])
         training_phrases.append(training_phrase)
 
@@ -20,14 +24,16 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
     message = dialogflow.Intent.Message(text=text)
 
     intent = dialogflow.Intent(
-        display_name=display_name, training_phrases=training_phrases, messages=[message]
+        display_name=display_name,
+        training_phrases=training_phrases,
+        messages=[message]
     )
 
     response = intents_client.create_intent(
         request={"parent": parent, "intent": intent}
     )
 
-    print("Intent created: {}".format(response))
+    logger.debug("Intent created: {}".format(response))
 
 
 def get_training_phrases(filepath):
@@ -38,13 +44,18 @@ def get_training_phrases(filepath):
 def main():
     load_dotenv()
     filepath = './questions.json'
-    project_id = 'game-of-verbs-316712'
+    project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
 
     intents = get_training_phrases(filepath)
 
     for intent_name, intent_content in intents.items():
-        questions, answer =  intent_content['questions'], intent_content['answer']
-        create_intent(project_id, intent_name, questions, [answer])
+        try:
+            questions, answer = intent_content['questions'], intent_content['answer']
+            create_intent(project_id, intent_name, questions, [answer])
+        except KeyError:
+            logger.exception('Wrong json key')
+        except ConnectionError:
+            logger.exception('Lost connection to Google Cloud')
 
 
 if __name__ == '__main__':
