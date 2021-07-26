@@ -71,6 +71,10 @@ python vkbot.py
 
 ```
 
-### Цель проекта
+## Пример чата в Telegram
+
+![Peek 2021-07-26 22-03](https://user-images.githubusercontent.com/80415662/127044574-49477718-e67d-401f-bc4e-f028f8b692da.gif)
+
+## Цель проекта
 
 Код написан в образовательных целях на онлайн-курсе для веб-разработчиков [dvmn.org](https://dvmn.org/).
