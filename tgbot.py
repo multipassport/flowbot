@@ -16,7 +16,7 @@ def start(update, context):
     update.message.reply_text('Здравствуйте')
 
 
-def greet(update, context):
+def reply(update, context):
     try:
         user_text = update.message.text
         answer, is_fallback = detect_intent_texts(
@@ -45,7 +45,7 @@ def main():
     context.bot_data['token'] = os.getenv('TG_BOT_TOKEN')
 
     dispatcher.add_handler(CommandHandler('start', start))
-    dispatcher.add_handler(MessageHandler(Filters.text, greet))
+    dispatcher.add_handler(MessageHandler(Filters.text, reply))
 
     updater.start_polling()
     updater.idle()

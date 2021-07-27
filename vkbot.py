@@ -13,14 +13,6 @@ from vk_api.exceptions import ApiError
 logger = logging.getLogger('intents')
 
 
-def echo(event, vk_api):
-    vk_api.messages.send(
-        user_id=event.user_id,
-        message=event.text,
-        random_id=random.randint(1, 1000)
-    )
-
-
 def answer(event, vk_api, project_id):
     message, is_fallback = detect_intent_texts(
         project_id, event.user_id, event.text, 'ru')

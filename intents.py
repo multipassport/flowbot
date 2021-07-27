@@ -85,9 +85,8 @@ def main():
 
     parser = create_parser()
     arguments = parser.parse_args()
-    filepath = arguments.filepath
 
-    intents = get_training_phrases(filepath)
+    intents = get_training_phrases(arguments.filepath)
 
     for intent_name, intent_content in intents.items():
         try:
