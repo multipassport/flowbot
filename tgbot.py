@@ -23,8 +23,8 @@ def reply(update, context):
             context.bot_data['project_id'],
             context.bot_data['token'], user_text, 'ru')
         update.message.reply_text(answer)
-    except NetworkError:
-        logger.exception('Network Error occured')
+    except NetworkError as error:
+        logger.exception(error)
 
 
 def main():

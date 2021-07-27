@@ -23,8 +23,8 @@ def detect_intent_texts(project_id, session_id, text, language_code):
             request={"session": session, "query_input": query_input}
         )
         query_result = response.query_result
-    except ConnectionError:
-        logger.exception('Lost connection to Google Cloud')
+    except ConnectionError as error:
+        logger.exception(error)
     return query_result.fulfillment_text, query_result.intent.is_fallback
 
 
@@ -61,8 +61,8 @@ def get_training_phrases(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8') as file:
             return json.load(file)
-    except FileNotFoundError:
-        logger.exception('Wrong filepath')
+    except FileNotFoundError as error:
+        logger.exception(error)
 
 
 def create_parser():
@@ -92,12 +92,8 @@ def main():
         try:
             questions, answer = intent_content['questions'], intent_content['answer']
             create_intent(project_id, intent_name, questions, [answer])
-        except KeyError:
-            logger.exception('Wrong json key')
-        except ConnectionError:
-            logger.exception('Lost connection to Google Cloud')
-        except InvalidArgument:
-            logger.exception(f'Intent {intent_name} already exists')
+        except(KeyError, ConnectionError, InvalidArgument) as error:
+            logger.exception(error)
 
 
 if __name__ == '__main__':
