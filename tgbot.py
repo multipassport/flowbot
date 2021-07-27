@@ -3,8 +3,7 @@ import os
 
 from intents import detect_intent_texts
 from dotenv import load_dotenv
-from handler import TelegramBotHandler
-from telegram.error import NetworkError
+from log_handler import TelegramBotHandler
 from telegram.ext import (Updater, CommandHandler, MessageHandler,
                           Filters, CallbackContext)
 
@@ -17,14 +16,11 @@ def start(update, context):
 
 
 def reply(update, context):
-    try:
-        user_text = update.message.text
-        answer, is_fallback = detect_intent_texts(
-            context.bot_data['project_id'],
-            context.bot_data['token'], user_text, 'ru')
-        update.message.reply_text(answer)
-    except NetworkError as error:
-        logger.exception(error)
+    user_text = update.message.text
+    answer, is_fallback = detect_intent_texts(
+        context.bot_data['project_id'],
+        context.bot_data['token'], user_text, 'ru')
+    update.message.reply_text(answer)
 
 
 def main():
@@ -44,6 +40,7 @@ def main():
     context.bot_data['project_id'] = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     context.bot_data['token'] = os.getenv('TG_BOT_TOKEN')
 
+    dispatcher.add_error_handler(logger.exception)
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(MessageHandler(Filters.text, reply))
 
