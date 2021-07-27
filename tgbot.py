@@ -1,7 +1,7 @@
 import logging
 import os
 
-from detect_intents import detect_intent_texts
+from intents import detect_intent_texts
 from dotenv import load_dotenv
 from handler import TelegramBotHandler
 from telegram.error import NetworkError

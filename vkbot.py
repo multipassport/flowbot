@@ -3,7 +3,7 @@ import random
 import os
 import vk_api as vk
 
-from detect_intents import detect_intent_texts
+from intents import detect_intent_texts
 from dotenv import load_dotenv
 from handler import TelegramBotHandler
 from vk_api.longpoll import VkLongPoll, VkEventType

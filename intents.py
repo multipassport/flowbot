@@ -9,7 +9,23 @@ from google.api_core.exceptions import InvalidArgument
 
 
 logger = logging.getLogger('intents')
-logging.basicConfig(filename='intents.log', level=logging.INFO)
+
+
+def detect_intent_texts(project_id, session_id, text, language_code):
+    try:
+        session_client = dialogflow.SessionsClient()
+        session = session_client.session_path(project_id, session_id)
+
+        text_input = dialogflow.TextInput(text=text, language_code=language_code)
+        query_input = dialogflow.QueryInput(text=text_input)
+
+        response = session_client.detect_intent(
+            request={"session": session, "query_input": query_input}
+        )
+        query_result = response.query_result
+    except ConnectionError:
+        logger.exception('Lost connection to Google Cloud')
+    return query_result.fulfillment_text, query_result.intent.is_fallback
 
 
 def create_intent(project_id, display_name,
@@ -63,6 +79,8 @@ def create_parser():
 
 def main():
     load_dotenv()
+    logging.basicConfig(filename='intents.log', level=logging.INFO)
+
     project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
 
     parser = create_parser()
