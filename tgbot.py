@@ -11,6 +11,10 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler,
 logger = logging.getLogger('intents')
 
 
+def error_handler(update, context):
+    logger.exception(context.error)
+
+
 def start(update, context):
     update.message.reply_text('Здравствуйте')
 
@@ -19,7 +23,10 @@ def reply(update, context):
     user_text = update.message.text
     answer, is_fallback = detect_intent_texts(
         context.bot_data['project_id'],
-        context.bot_data['token'], user_text, 'ru')
+        context.bot_data['token'],
+        user_text,
+        language_code='ru',
+    )
     update.message.reply_text(answer)
 
 
@@ -40,7 +47,7 @@ def main():
     context.bot_data['project_id'] = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
     context.bot_data['token'] = os.getenv('TG_BOT_TOKEN')
 
-    dispatcher.add_error_handler(logger.exception)
+    dispatcher.add_error_handler(error_handler)
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(MessageHandler(Filters.text, reply))
 
