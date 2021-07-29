@@ -1,13 +1,12 @@
 import logging
-import random
 import os
+import random
 import vk_api as vk
 
-from intents import detect_intent_texts
 from dotenv import load_dotenv
+from intents import detect_intent_texts
 from log_handler import TelegramBotHandler
 from vk_api.longpoll import VkLongPoll, VkEventType
-from vk_api.exceptions import ApiError
 
 
 logger = logging.getLogger('intents')
@@ -15,12 +14,13 @@ logger = logging.getLogger('intents')
 
 def answer(event, vk_api, project_id):
     message, is_fallback = detect_intent_texts(
-        project_id, event.user_id, event.text, 'ru')
+        project_id, event.user_id, event.text, 'ru'
+    )
     if not is_fallback:
         vk_api.messages.send(
             user_id=event.user_id,
             message=message,
-            random_id=random.randint(1, 1000)
+            random_id=random.randint(1, 1000),
         )
 
 
@@ -44,7 +44,7 @@ def main():
         try:
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 answer(event, vk_api, project_id)
-        except ApiError as error:
+        except Exception as error:
             logger.exception(error)
 
 
