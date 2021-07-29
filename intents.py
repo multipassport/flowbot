@@ -1,30 +1,22 @@
 import argparse
 import json
-import logging
 import os
 
 from dotenv import load_dotenv
 from google.cloud import dialogflow
-from google.api_core.exceptions import InvalidArgument
-
-
-logger = logging.getLogger('intents')
 
 
 def detect_intent_texts(project_id, session_id, text, language_code):
-    try:
-        session_client = dialogflow.SessionsClient()
-        session = session_client.session_path(project_id, session_id)
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(project_id, session_id)
 
-        text_input = dialogflow.TextInput(text=text, language_code=language_code)
-        query_input = dialogflow.QueryInput(text=text_input)
+    text_input = dialogflow.TextInput(text=text, language_code=language_code)
+    query_input = dialogflow.QueryInput(text=text_input)
 
-        response = session_client.detect_intent(
-            request={"session": session, "query_input": query_input}
-        )
-        query_result = response.query_result
-    except ConnectionError as error:
-        logger.exception(error)
+    response = session_client.detect_intent(
+        request={"session": session, "query_input": query_input}
+    )
+    query_result = response.query_result
     return query_result.fulfillment_text, query_result.intent.is_fallback
 
 
@@ -50,19 +42,12 @@ def create_intent(project_id, display_name,
         messages=[message]
     )
 
-    response = intents_client.create_intent(
-        request={"parent": parent, "intent": intent}
-    )
-
-    logger.debug("Intent created: {}".format(response))
+    intents_client.create_intent(request={"parent": parent, "intent": intent})
 
 
 def get_training_phrases(filepath):
-    try:
-        with open(filepath, 'r', encoding='utf-8') as file:
-            return json.load(file)
-    except FileNotFoundError as error:
-        logger.exception(error)
+    with open(filepath, 'r', encoding='utf-8') as file:
+        return json.load(file)
 
 
 def create_parser():
@@ -79,7 +64,6 @@ def create_parser():
 
 def main():
     load_dotenv()
-    logging.basicConfig(filename='intents.log', level=logging.INFO)
 
     project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
 
@@ -89,11 +73,8 @@ def main():
     intents = get_training_phrases(arguments.filepath)
 
     for intent_name, intent_content in intents.items():
-        try:
-            questions, answer = intent_content['questions'], intent_content['answer']
-            create_intent(project_id, intent_name, questions, [answer])
-        except(KeyError, ConnectionError, InvalidArgument) as error:
-            logger.exception(error)
+        questions, answer = intent_content['questions'], intent_content['answer']
+        create_intent(project_id, intent_name, questions, [answer])
 
 
 if __name__ == '__main__':
